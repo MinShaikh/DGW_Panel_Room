@@ -1,0 +1,317 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dream Gateway Panel Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Roboto+Slab:wght@600;700&display=swap">
+<style>
+/* Layout: full-bleed 3D viewport, floating spec panel top-left, camera toolbar at the bottom. Single dark drawing-board look, matching the transformer room viewer. */
+:root {
+  color-scheme: dark;
+  --bg: #141c25;
+  --panel: rgba(24, 34, 46, 0.92);
+  --line: #2f3d4d;
+  --fg: #e7edf2;
+  --muted: #93a2b2;
+  --amber: #e0a03a;
+  --teal: #3fb5a8;
+  --chip: #223041;
+  --display: "Roboto Slab", Cambria, Georgia, serif;
+  --body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); overflow: hidden; }
+#stage { position: fixed; inset: 0; }
+#stage canvas { display: block; width: 100%; height: 100%; outline: none; }
+.panel {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  left: max(16px, env(safe-area-inset-left, 0px));
+  width: min(340px, calc(100vw - 32px));
+  max-height: calc(100% - 120px); overflow: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px 18px; backdrop-filter: blur(6px);
+  display: grid; gap: 12px;
+}
+.eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 600; }
+h1 { margin: 0; font-family: var(--display); font-size: 22px; line-height: 1.2; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.legend li { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: block; }
+.legend span:last-child { font-family: var(--mono); color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+.toggles label { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; background: var(--chip); border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px; cursor: pointer; user-select: none; }
+.toggles input { accent-color: var(--teal); margin: 0; }
+.note { font-size: 11.5px; color: var(--muted); line-height: 1.45; margin: 0; }
+.collapse { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; font: 12px var(--body); padding: 3px 8px; cursor: pointer; }
+.panel.min > :not(.head):not(.collapse) { display: none; }
+.head { display: grid; gap: 4px; padding-right: 48px; }
+.bar {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 4px; padding: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  max-width: calc(100vw - 32px); overflow-x: auto;
+}
+.bar button { background: none; border: 0; color: var(--fg); font: 500 13px var(--body); padding: 8px 14px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.bar button[aria-pressed="true"] { background: var(--chip); color: var(--amber); }
+button:focus-visible, .toggles label:focus-within { outline: 2px solid var(--teal); outline-offset: 2px; }
+.hint { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 22px); font-size: 11.5px; color: var(--muted); }
+@media (max-width: 760px) { .hint { display: none; } .bar { bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); } }
+#err { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+</style>
+
+<div id="stage" aria-label="3D view of the Dream Gateway panel room"></div>
+
+<section class="panel" id="panel">
+  <button class="collapse" id="collapse" aria-expanded="true">Hide</button>
+  <div class="head">
+    <div class="eyebrow">Dream Gateway · Electrical</div>
+    <h1>Panel room</h1>
+  </div>
+  <p class="sub">Concept layout of the LV panel room, 5.40 × 6.00 m, with a 1500 mm entry door.</p>
+  <ul class="legend">
+    <li><i style="background:#3c5aa8"></i><span>LT panel</span><span>3000 × 600</span></li>
+    <li><i style="background:#c8a234"></i><span>Emergency panel</span><span>2000 × 600</span></li>
+    <li><i style="background:#2e7f78"></i><span>Lift panel</span><span>2000 × 600</span></li>
+    <li><i style="background:#5e7f3a"></i><span>APFC panel</span><span>1500 × 600</span></li>
+    <li><i style="background:#3a8f86"></i><span>HVAC panel</span><span>1500 × 600</span></li>
+    <li><i style="background:#22292f;outline:1px solid #6f7b86"></i><span>Battery rack</span><span>870 × 600</span></li>
+    <li><i style="background:#8a959f"></i><span>UPS</span><span>600 × 600</span></li>
+  </ul>
+  <div class="toggles" role="group" aria-label="Show or hide layers">
+    <label><input type="checkbox" id="t-walls" checked> Walls</label>
+    <label><input type="checkbox" id="t-labels" checked> Labels</label>
+    <label><input type="checkbox" id="t-dims" checked> Dimensions</label>
+  </div>
+  <p class="note">Indicative concept model, not for construction. Plan positions are from the panel room layout; panel heights are assumed and to be confirmed with the panel vendor.</p>
+</section>
+
+<nav class="bar" aria-label="Camera views">
+  <button data-view="iso" aria-pressed="true">3D view</button>
+  <button data-view="top" aria-pressed="false">Plan</button>
+  <button data-view="front" aria-pressed="false">Front</button>
+  <button data-view="inside" aria-pressed="false">Walk-in</button>
+</nav>
+<div class="hint">Drag to rotate · scroll or pinch to zoom · right-drag to pan</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function () {
+  if (!window.THREE || !THREE.OrbitControls) {
+    document.body.insertAdjacentHTML("beforeend", '<div id="err">The 3D viewer could not load. Check the internet connection and reload the page.</div>');
+    return;
+  }
+  // Plan coordinates in metres: x = left to right on the drawing, z = top (rear wall) to bottom (front wall).
+  const RX = 5.4, RZ = 6.0, WALL_H = 3.6, WT = 0.2, ST = 0.25;
+  const D0 = 3.13, D1 = D0 + 1.5, DH = 2.4;   // door on left wall
+  const OX = RX / 2, OZ = RZ / 2;
+
+  const stage = document.getElementById("stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(stage.clientWidth, stage.clientHeight);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x141c25);
+  scene.fog = new THREE.Fog(0x141c25, 30, 70);
+  const camera = new THREE.PerspectiveCamera(40, stage.clientWidth / stage.clientHeight, 0.05, 200);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 1.5; controls.maxDistance = 45;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x2a333d, 0.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.7);
+  sun.position.set(6, 14, 9); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 });
+  sun.shadow.bias = -0.0005; scene.add(sun);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.12));
+  const lamp = new THREE.PointLight(0xfff1dc, 0.35, 12); lamp.position.set(0, 3.3, 0); scene.add(lamp);
+
+  const root = new THREE.Group(); root.position.set(-OX, 0, -OZ); scene.add(root);
+  const M = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.8, metalness: 0.0 }, o));
+  function boxMesh(x0, z0, x1, z1, y0, h, mat, opts = {}) {
+    const w = x1 - x0, d = z1 - z0;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x0 + w / 2, y0 + h / 2, z0 + d / 2);
+    m.castShadow = opts.cast !== false; m.receiveShadow = true;
+    (opts.parent || root).add(m);
+    if (opts.edge !== false) {
+      const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: opts.edgeColor || 0x0e151c, transparent: true, opacity: opts.edgeOpacity ?? 0.4 }));
+      e.position.copy(m.position); (opts.parent || root).add(e);
+    }
+    return m;
+  }
+
+  // Ground
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), M(0x18212b, { roughness: 1 }));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -ST - 0.01; ground.receiveShadow = true; scene.add(ground);
+  const grid = new THREE.GridHelper(40, 40, 0x34475a, 0x34475a); grid.position.y = -ST;
+  grid.material.transparent = true; grid.material.opacity = 0.3; scene.add(grid);
+
+  // Floor slab
+  boxMesh(-WT, -WT, RX + WT, RZ + WT, -ST, ST, M(0x8e9aa6), { edgeOpacity: 0.5 });
+  boxMesh(0, 0, RX, RZ, -0.001, 0.002, M(0xa6b1bc), { edge: false, cast: false });
+
+  // Walls (all four, translucent) with the door opening in the left wall
+  const walls = new THREE.Group(); root.add(walls);
+  const glass = M(0xc9d2db, { transparent: true, opacity: 0.22, depthWrite: false, roughness: 1, side: THREE.DoubleSide });
+  const W = (x0, z0, x1, z1, y0, h) => boxMesh(x0, z0, x1, z1, y0, h, glass, { cast: false, edgeOpacity: 0.35, edgeColor: 0x9fb3c6, parent: walls });
+  W(-WT, -WT, RX + WT, 0, 0, WALL_H);            // rear
+  W(-WT, RZ, RX + WT, RZ + WT, 0, WALL_H);       // front
+  W(RX, 0, RX + WT, RZ, 0, WALL_H);              // right
+  W(-WT, 0, 0, D0, 0, WALL_H);                   // left, before door
+  W(-WT, D1, 0, RZ, 0, WALL_H);                  // left, after door
+  W(-WT, D0, 0, D1, DH, WALL_H - DH);            // over door
+  // Door leaves, frame head, handles
+  boxMesh(-0.12, D0 + 0.02, -0.07, D0 + 0.745, 0, DH - 0.02, M(0x5d6872), { edgeOpacity: 0.6 });
+  boxMesh(-0.12, D0 + 0.755, -0.07, D1 - 0.02, 0, DH - 0.02, M(0x5d6872), { edgeOpacity: 0.6 });
+  boxMesh(-0.06, D0 - 0.08, 0.02, D1 + 0.08, DH, 0.12, M(0x3e4852), { edgeOpacity: 0.6 });
+  [D0 + 0.66, D0 + 0.81].forEach(hz => boxMesh(-0.07, hz, -0.03, hz + 0.03, 1.0, 0.25, M(0xc9ced3), { edge: false }));
+
+  // Equipment
+  const labels = new THREE.Group(); scene.add(labels);
+  function panel(name, x0, z0, x1, z1, h, color, faceDir, n) {
+    boxMesh(x0, z0, x1, z1, 0.1, h, M(color, { roughness: 0.65 }), { edgeOpacity: 0.5 });
+    boxMesh(x0 + 0.03, z0 + 0.03, x1 - 0.03, z1 - 0.03, 0, 0.1, M(0x2b3138), { edge: false });
+    const along = faceDir[0] === "x" ? "z" : "x";
+    const L = along === "x" ? x1 - x0 : z1 - z0;
+    const dark = M(0x1d252d, { roughness: 0.5 }), metal = M(0xcfd5da, { metalness: 0.5, roughness: 0.35 });
+    const seam = new THREE.LineBasicMaterial({ color: 0x0f161d, transparent: true, opacity: 0.6 });
+    for (let i = 0; i < n; i++) {
+      const a = (i + 0.5) / n, wy = 0.1 + h * 0.62;
+      if (along === "x") {
+        const x = x0 + a * L, z = faceDir === "z+" ? z1 + 0.012 : z0 - 0.012;
+        boxMesh(x - 0.11, z - 0.01, x + 0.11, z + 0.01, wy, 0.16, dark, { edge: false, cast: false });
+        boxMesh(x + 0.18, z - 0.015, x + 0.21, z + 0.015, 0.1 + h * 0.45, 0.18, metal, { edge: false, cast: false });
+      } else {
+        const z = z0 + a * L, x = faceDir === "x+" ? x1 + 0.012 : x0 - 0.012;
+        boxMesh(x - 0.01, z - 0.11, x + 0.01, z + 0.11, wy, 0.16, dark, { edge: false, cast: false });
+        boxMesh(x - 0.015, z + 0.18, x + 0.015, z + 0.21, 0.1 + h * 0.45, 0.18, metal, { edge: false, cast: false });
+      }
+      if (i > 0) {
+        const t = i / n; let sx, sz;
+        if (along === "x") { sx = x0 + t * L; sz = faceDir === "z+" ? z1 + 0.004 : z0 - 0.004; }
+        else { sz = z0 + t * L; sx = faceDir === "x+" ? x1 + 0.004 : x0 - 0.004; }
+        root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(sx, 0.12, sz), new THREE.Vector3(sx, 0.08 + h, sz)]), seam));
+      }
+    }
+    tag(name, (x0 + x1) / 2, h + 0.55, (z0 + z1) / 2);
+  }
+  function batteryRack(x0, z0, x1, z1) {
+    const frame = M(0x6f7b86, { metalness: 0.3, roughness: 0.6 }), batt = M(0x22292f, { roughness: 0.6 });
+    const tiers = 4, h = 1.6, tierH = h / tiers;
+    [[x0, z0], [x1 - 0.05, z0], [x0, z1 - 0.05], [x1 - 0.05, z1 - 0.05]].forEach(([px, pz]) => boxMesh(px, pz, px + 0.05, pz + 0.05, 0, h, frame, { edge: false }));
+    for (let t = 0; t < tiers; t++) {
+      const y = t * tierH + 0.05;
+      boxMesh(x0, z0, x1, z1, y, 0.04, frame, { edgeOpacity: 0.3 });
+      const nb = 4, gap = 0.04, bw = ((x1 - x0) - gap * (nb + 1)) / nb;
+      for (let b = 0; b < nb; b++) {
+        const bx = x0 + gap + b * (bw + gap);
+        boxMesh(bx, z0 + 0.08, bx + bw, z1 - 0.08, y + 0.04, tierH * 0.62, batt, { edgeOpacity: 0.25 });
+        boxMesh(bx + 0.04, z1 - 0.19, bx + 0.09, z1 - 0.14, y + 0.04 + tierH * 0.62, 0.03, M(0xc0392b), { edge: false });
+        boxMesh(bx + bw - 0.09, z1 - 0.19, bx + bw - 0.04, z1 - 0.14, y + 0.04 + tierH * 0.62, 0.03, M(0x2c3e50), { edge: false });
+      }
+    }
+    boxMesh(x0, z0, x1, z1, h, 0.04, frame, { edgeOpacity: 0.3 });
+    tag("Battery rack", (x0 + x1) / 2, h + 0.55, (z0 + z1) / 2);
+  }
+
+  // Sprite text
+  function sprite(text, o = {}) {
+    const size = o.size || 40, pad = 16, font = `600 ${size}px "IBM Plex Sans", Arial, sans-serif`;
+    const cv = document.createElement("canvas"), ctx = cv.getContext("2d");
+    ctx.font = font; const w = Math.ceil(ctx.measureText(text).width) + pad * 2, h = size + pad * 1.3;
+    cv.width = w; cv.height = h; ctx.font = font;
+    if (o.bg) { ctx.fillStyle = o.bg; ctx.beginPath(); const r = 10; ctx.moveTo(r, 0); ctx.arcTo(w, 0, w, h, r); ctx.arcTo(w, h, 0, h, r); ctx.arcTo(0, h, 0, 0, r); ctx.arcTo(0, 0, w, 0, r); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle = o.color || "#e7edf2"; ctx.textBaseline = "middle"; ctx.fillText(text, pad, h / 2 + 1);
+    const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+    const k = o.scale || 0.0062; s.scale.set(w * k, h * k, 1); s.renderOrder = 10; return s;
+  }
+  function tag(text, x, y, z) { const s = sprite(text, { bg: "rgba(20,28,37,0.88)" }); s.position.set(x - OX, y, z - OZ); labels.add(s); }
+
+  const C = { lt: 0x3c5aa8, emer: 0xc8a234, lift: 0x2e7f78, hvac: 0x3a8f86, apfc: 0x5e7f3a, ups: 0x8a959f };
+  panel("LT panel", 1.24, 0.15, 4.24, 0.75, 2.2, C.lt, "z+", 4);
+  panel("Emergency panel", 4.65, 1.06, 5.25, 3.06, 2.1, C.emer, "x-", 3);
+  panel("Lift panel", 4.65, 3.21, 5.25, 5.21, 2.1, C.lift, "x-", 3);
+  panel("APFC panel", 0.15, 1.30, 0.75, 2.80, 2.0, C.apfc, "x+", 2);
+  panel("HVAC panel", 2.72, 5.40, 4.22, 6.00, 2.0, C.hvac, "z-", 2);
+  batteryRack(0.25, 5.22, 1.12, 5.82);
+  panel("UPS", 1.27, 5.22, 1.87, 5.82, 1.6, C.ups, "z-", 1);
+  tag("Entry door 1500", -0.15, DH + 0.45, (D0 + D1) / 2);
+
+  // Dimensions
+  const dims = new THREE.Group(); root.add(dims);
+  const dimMat = new THREE.LineBasicMaterial({ color: 0xe0a03a });
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  function dim(a, b, text, off, tick) {
+    const p = [a.clone().add(off), b.clone().add(off)];
+    dims.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(p), dimMat));
+    [a, b].forEach(q => {
+      const c = q.clone().add(off);
+      dims.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([c.clone().addScaledVector(tick, 0.12), c.clone().addScaledVector(tick, -0.12)]), dimMat));
+      dims.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([q.clone(), c]), new THREE.LineBasicMaterial({ color: 0xe0a03a, transparent: true, opacity: 0.35 })));
+    });
+    const s = sprite(text, { size: 38, color: "#141c25", bg: "rgba(224,160,58,0.95)" });
+    s.position.copy(p[0].clone().lerp(p[1], 0.5)); dims.add(s);
+  }
+  const y0 = 0.02;
+  dim(V(0, y0, RZ), V(RX, y0, RZ), "5400", V(0, 0, 0.9), V(0, 0, 1));
+  dim(V(RX, y0, 0), V(RX, y0, RZ), "6000", V(0.9, 0, 0), V(1, 0, 0));
+  dim(V(RX, y0, 0), V(RX, y0, 1.06), "1060", V(0.45, 0, 0), V(1, 0, 0));
+  dim(V(RX, y0, 5.21), V(RX, y0, RZ), "790", V(0.45, 0, 0), V(1, 0, 0));
+  dim(V(1.24, y0, 0.75), V(4.24, y0, 0.75), "3000", V(0, 0, 0.35), V(0, 0, 1));
+  dim(V(0, y0, D0), V(0, y0, D1), "Door 1500", V(-1.1, 0, 0), V(1, 0, 0));
+  dim(V(RX, 0, 0), V(RX, WALL_H, 0), "3.6 m (assumed)", V(0.7, 0, -0.7), V(1, 0, 0));
+
+  // Views
+  const views = {
+    iso:    { pos: V(9.5, 9.5, 11),   tgt: V(0, 0.9, 0) },
+    top:    { pos: V(0, 17, 0.01),    tgt: V(0, 0, 0) },
+    front:  { pos: V(0, 2.0, 14),     tgt: V(0, 1.3, 0) },
+    inside: { pos: V(-2.35, 1.65, 0.9), tgt: V(1.2, 1.3, -1.0) },
+  };
+  const panelEl = document.getElementById("panel"), col = document.getElementById("collapse");
+  let anim = null, walking = false;
+  function fit() { const a = stage.clientWidth / stage.clientHeight; return a < 1 ? Math.min(2.0, 1.2 / a) : 1; }
+  function goTo(name, instant) {
+    const v = views[name];
+    document.querySelectorAll(".bar button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === name)));
+    const f = fit();
+    const shift = (name !== "inside" && stage.clientWidth > 900 && !panelEl.classList.contains("min")) ? V(-1.6 * f, 0, 0) : V(0, 0, 0);
+    const tgt = v.tgt.clone().add(shift);
+    const pos = name === "inside" ? v.pos.clone() : tgt.clone().add(v.pos.clone().sub(v.tgt).multiplyScalar(f));
+    walking = name === "inside"; applyLayers();
+    if (instant || matchMedia("(prefers-reduced-motion: reduce)").matches) { camera.position.copy(pos); controls.target.copy(tgt); controls.update(); return; }
+    anim = { from: camera.position.clone(), to: pos, tFrom: controls.target.clone(), tTo: tgt, t: 0 };
+  }
+  document.querySelectorAll(".bar button").forEach(b => b.addEventListener("click", () => goTo(b.dataset.view)));
+
+  const wallsEl = document.getElementById("t-walls"), labelsEl = document.getElementById("t-labels"), dimsEl = document.getElementById("t-dims");
+  function applyLayers() {
+    walls.visible = wallsEl.checked;
+    labels.visible = labelsEl.checked && !walking;
+    dims.visible = dimsEl.checked && !walking;
+  }
+  [wallsEl, labelsEl, dimsEl].forEach(el => el.addEventListener("change", applyLayers));
+  col.addEventListener("click", () => { const m = panelEl.classList.toggle("min"); col.textContent = m ? "Show" : "Hide"; col.setAttribute("aria-expanded", String(!m)); });
+  if (window.innerWidth < 640) { panelEl.classList.add("min"); col.textContent = "Show"; col.setAttribute("aria-expanded", "false"); }
+
+  window.addEventListener("resize", () => { renderer.setSize(stage.clientWidth, stage.clientHeight); camera.aspect = stage.clientWidth / stage.clientHeight; camera.updateProjectionMatrix(); });
+  goTo("iso", true);
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  (function loop() {
+    requestAnimationFrame(loop);
+    if (anim) {
+      anim.t = Math.min(1, anim.t + 0.03); const k = ease(anim.t);
+      camera.position.lerpVectors(anim.from, anim.to, k); controls.target.lerpVectors(anim.tFrom, anim.tTo, k);
+      if (anim.t >= 1) anim = null;
+    }
+    controls.update(); renderer.render(scene, camera);
+  })();
+})();
+</script>
+</html>
