@@ -1,4 +1,4 @@
-# Dream Gateway – Panel Room 3D
+# DGW – Panel Room 3D
 
 Interactive 3D concept model of the Dream Gateway LV panel room (5.40 x 6.00 m), prepared by Engineering Virtual Built Consultants Pvt. Ltd.
 
